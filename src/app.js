@@ -79,7 +79,7 @@ app.v.drawDoveBadge=function(hwid){
     	strokeColor:strokeColor,
     	strokeWidth:strokeWidth
     });
-		  
+	return path;	  
 	};
 	
 	var diamond=function(x,y,l,w1,w2){
@@ -135,13 +135,14 @@ app.v.drawDoveBadge=function(hwid){
     // var ngon=model.paper.path(path).attr({"stroke":"#fff"});
     //return ngon;
     p.strokeColor = strokeColor;
-    p.strokeWidth = strokeWidth;
+    p.strokeWidth = 10 * strokeWidth;
+    return p;
     };
 
 
-
-  ngon(paper.view.bounds.centerX, paper.view.bounds.centerY,0.5* paper.view.bounds.centerX, 6);
-
+  var paths = [];
+  var hexagon = ngon(paper.view.bounds.centerX, paper.view.bounds.centerY,0.5* paper.view.bounds.centerX, 6);
+  paths.push(hexagon);
 
   var orbits=24;
   var r=0;
@@ -158,26 +159,28 @@ app.v.drawDoveBadge=function(hwid){
       var theta=j*theta_interval;
       var position=geo.getPoint(paper.view.bounds.centerX,paper.view.bounds.centerY,r,theta);
       if (ringType=="circle"){
-        circle(position.x2,position.y2,planetRadius);   
+        paths.push(circle(position.x2,position.y2,planetRadius));   
       }else if (ringType=="diamond"){
-        diamond(
+        paths.push(diamond(
           paper.view.bounds.centerX+r,
           paper.view.bounds.centerY,
           planetRadius,
           w1
-          ).rotate(theta,paper.view.center);
+          ).rotate(theta,paper.view.center));
         
       }else{
-        petal(
+        paths.push(petal(
           paper.view.bounds.centerX+r,
           paper.view.bounds.centerY,
           planetRadius,
           w1
-          ).rotate(theta,paper.view.center);
+          ).rotate(theta,paper.view.center));
       }            
     }
   }
 
+    var group = new paper.Group(paths);
+    group.clipped = true;
 
 	paper.view.draw();
 };
