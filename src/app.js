@@ -19,7 +19,7 @@ app.m.paper=false;
 app.m.dateOffset=0;
 app.m.globalAnimationLock=false;
 app.m.selectedDate=new Date();
-app.m.appName="Mandala Time";
+app.m.appName="Dovie";
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////begin controllers
@@ -64,9 +64,9 @@ app.v.initBounds=function(){
 app.v.initialReveal=function(){
 };
 
-app.v.drawMandala=function(date){
-  var d=date||app.m.selectedDate;
-  var chnc = new Chance(d.toDateString() );
+app.v.drawDoveBadge=function(hwid){
+  hwid = hwid || "0C03";
+  var chnc = new Chance(hwid);
   //var chnc=new Chance();
   paper.project.clear();
   var strokeWidth=1;
@@ -150,70 +150,19 @@ app.v.drawMandala=function(date){
 
 app.v.initPaper=function(){
   var canvas = document.getElementById('paper');
-  //var chnc = new Chance();
 	paper.setup(canvas);
-	app.v.drawMandala();
+	app.v.drawDoveBadge();
 	paper.view.onResize=function(event){
-	  app.v.drawMandala();
+	  app.v.drawDoveBadge();
 	  paper.view.draw();
 	};
-	var mc=new Hammer(document.getElementById('paper'));
-	mc.on("panleft panright",function(event){
-	  if (!app.m.globalAnimationLock){
-	    app.m.globalAnimationLock=true;
-  	  if (event.type==="panleft"){
-  	    $("body").trigger("nextDay");
-  	  }else if (event.type==="panright"){
-  	    $("body").trigger("previousDay");
-  	  }
-  	 setTimeout(function(){app.m.globalAnimationLock=false;},600);
-	  }
-	});
 };
 
 app.v.listeners=function(){
-  var changeDate=function(offset){
-    app.m.dateOffset=app.m.dateOffset+offset;
-    app.m.selectedDate=moment()
-      .add(app.m.dateOffset,'d')
-      .toDate();
-    app.v.drawMandala(app.m.selectedDate);
-    
-    $("div#dateDisplay").html(moment(app.m.selectedDate).format("dddd, MMMM Do YYYY"));
-  };
-
-  $("body").on("nextDay",function(){
-    changeDate(1);
+  document.getElementsByClassName("code-input")[0].addEventListener("keyup",function(){
+        var code = document.getElementsByClassName("code-input")[0].value;
+        app.v.drawDoveBadge(code);
   });
-  
-  $("body").on("previousDay",function(){
-    changeDate(-1);
-  });
-
-
-  //replace this with the swipe listeners;
-  /*
-  $("body").on("click",function(event){
-    if (event.pageX>paper.view.bounds.centerX){
-      $("body").trigger("nextDay");
-    }else{
-      $("body").trigger("previousDay");
-    }
-  });
-  */
-  //keydowns
-  
-  $("body").keydown(function(){
-    var key=event.which;
-    //console.log(key);
-    if (key==37){
-      $("body").trigger("previousDay");
-    }else if(key==39){
-      $("body").trigger("nextDay");
-    }
-  });
-  
-
 };
 
 ///////////////////////////////////////////////////////end views
@@ -221,10 +170,8 @@ app.v.listeners=function(){
 
 app.t.layout=function(){
   var d="";
-  d+="<canvas id='paper' data-paper-resize='true' data-paper-keepalive='true'></canvas>";
-  d+="<div id='dateDisplay'>"+moment(app.m.selectedDate).format("dddd, MMMM Do YYYY")+"</div>";
-  //d+="<div id='previousDay'>See the Previous Day's Mandala Clock</div>";
-  //d+="<div id='nextDay'>See the Next Day's Mandala Clock</div>";
+  d+="<div class='central'><canvas id='paper' data-paper-resize='true' data-paper-keepalive='true'></canvas></div>";
+  d+="<div class='central'><input class='code-input' placeholder='enter dove id' type='text'></input></div>";
   return d;
 };
 
@@ -245,22 +192,16 @@ zi.config=function(){
         "margin":"0",
         "padding":"0",
         "border":"0",
-        "position":"fixed"
+        "width":"600px"
       },
-      "canvas#paper":{
-        "z-index":"-1"
-      },
-      "div#yesterday":{
-        "float":"left"
-      },
-      "div#tomorrow":{
-        "float":"right"
-      },
-      "div#dateDisplay":{
-        "padding":"30px",
-        "color":"#ddd",
-        "position":"fixed",
+      "div.central":{
+        "width":"600px",
+        "margin":"10px auto 0px auto",
         "z-index":"0"
+      },
+      "input[type=text]":{
+        "font-size":"3em",
+        "width":"100%"
       }
     };
     return css;
