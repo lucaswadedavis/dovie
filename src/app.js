@@ -110,6 +110,39 @@ app.v.drawDoveBadge=function(hwid){
     return p;
 	};
 
+   ngon=function(x,y,r,n){
+    if (!n){n=3};
+    // var path="";
+    // path+="M "+geo.getPoint(x,y,r,0).x2+" "+geo.getPoint(x,y,r,0).y2;
+    var initialPoint = geo.getPoint(x,y,r,90);
+    var p = new paper.Path;
+    p.add([initialPoint.x2, initialPoint.y2]);
+    var interval=360/n;
+    for (var i=0;i<n;i++){
+        var theta=(interval*i)+90;
+        var innerX = geo.getPoint(x,y,r,theta).x2;
+        var innerY = geo.getPoint(x,y,r,theta).y2;
+        // path+=" L"+geo.getPoint(x,y,r,theta).x2+" "+geo.getPoint(x,y,r,theta).y2;
+        p.add(new paper.Segment(
+            new paper.Point([innerX, innerY])
+        ));
+    }   
+
+    p.add(new paper.Segment(
+        new paper.Point([initialPoint.x2, initialPoint.y2])
+        ));
+    // path+="Z";
+    // var ngon=model.paper.path(path).attr({"stroke":"#fff"});
+    //return ngon;
+    p.strokeColor = strokeColor;
+    p.strokeWidth = strokeWidth;
+    };
+
+
+
+  ngon(paper.view.bounds.centerX, paper.view.bounds.centerY,0.5* paper.view.bounds.centerX, 6);
+
+
   var orbits=24;
   var r=0;
   var planets=60;
@@ -144,6 +177,7 @@ app.v.drawDoveBadge=function(hwid){
       }            
     }
   }
+
 
 	paper.view.draw();
 };
